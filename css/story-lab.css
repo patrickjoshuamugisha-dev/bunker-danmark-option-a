@@ -1,0 +1,38 @@
+/* =====================================================================
+   Story lab (2026-09-17). Additive: loaded only by story-a.html and story-b.html.
+   The room (V12's third section) comes into V11 after Processen, on the page's own navy (#0d1c2e, the
+   footer and the contact card). A: the three cards follow inside the same navy section. B: the room is
+   its own navy band and the cards keep their paper section.
+   Grid: the cards' own edges, 78px to 1378px at 1470.
+   ===================================================================== */
+.s11-navy { background: #0d1c2e !important; color: #eef2f6; position: relative; }
+.s11-room { display: grid; grid-template-columns: minmax(0, 46fr) minmax(0, 54fr); gap: clamp(40px, 6vw, 96px); align-items: center; padding-right: 78px; }
+.s11-room__media { margin: 0; height: min(74vh, 640px); overflow: hidden; border-radius: 0 20px 20px 0; box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.7); }
+.s11-room__media img { display: block; width: 100%; height: 112%; margin-top: -6%; object-fit: cover; object-position: 50% 55%; will-change: transform; }
+.s11-room__title { margin: 0; font-size: clamp(2.5rem, 4.4vw, 4.25rem); font-weight: 500; letter-spacing: -0.035em; line-height: 1.02; color: #f3f5f7; }
+.s11-room__lead { margin: 28px 0 0; max-width: 30em; font-size: 20px; line-height: 1.5; color: rgba(238, 242, 246, 0.82); text-wrap: pretty; }
+
+/* A: room, then the heading and the cards, one navy ground */
+.s11-navy.product-grid { padding-top: 120px !important; }
+.s11-navy.product-grid .s11-room { margin: 0 -70px 150px; }
+/* the fold under the navy section: the tab hangs into the contact section's own grey, no paper strip between */
+.s11-navy + .notch-separator__wrapper .notch-top__bg-container { background: #e1e6eb !important; }
+.s11-navy .product-grid__heading { color: #f3f5f7 !important; }
+.s11-navy .product-grid__card { border-color: transparent !important; box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.65) !important; }
+
+/* B: the band alone */
+.s11-band { padding: 120px 0; }
+
+/* entrances: the page's own rise, moved by story-lab.js */
+.js-polish .s11-room [data-s11] { opacity: 0; transform: translateY(28px); transition: opacity 1.1s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0s), transform 1.3s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 0s); }
+.js-polish .s11-room [data-s11].is-in { opacity: 1; transform: none; }
+
+@media (max-width: 1023.98px) {
+  .s11-room { grid-template-columns: 1fr; gap: 36px; padding-right: 0; }
+  .s11-room__media { height: 52vh; border-radius: 0; }
+  .s11-room__text { padding: 0 20px; }
+  .s11-room__lead { font-size: 18px; }
+  .s11-navy.product-grid { padding-top: 0 !important; }
+  .s11-navy.product-grid .s11-room { margin: 0 -20px 72px; }
+  .s11-band { padding: 0 0 72px; }
+}

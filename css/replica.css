@@ -1,0 +1,1072 @@
+/* ---------------------------------------------------------------------------
+   replica.css — the ONLY hand-written CSS in this build.
+   Everything else is Terminal's own stylesheet, copied verbatim (css/terminal.css).
+
+   Three jobs:
+   1. Stand in for state their Vue app sets at runtime (the SSR markup ships hidden
+      and their JS reveals it). Copying the CSS alone leaves those bits invisible.
+   2. The one deliberate structural difference: the hero is a still image, not a
+      410-frame canvas scrub.
+   3. The hero's own copy block — headline, sub-line and the address check — which
+      is ours, not theirs, so it has no CSS to copy.
+   Anything added here must be justified in a comment, so the "what did we change"
+   answer stays honest.
+--------------------------------------------------------------------------- */
+
+/* --- 1. runtime state their app would have set ---------------------------- */
+
+/* Pre-hydration splash. Their app removes it on mount; js/app.js does the same,
+   this is the no-JS fallback so the page is never a blank grey sheet. */
+.app-loader { display: none !important; }
+
+/* SSR ships the hero copy hidden (visibility:hidden) and the sequence player
+   reveals it. We show it directly. */
+.homepage-scroll-content { visibility: visible !important; }
+
+/* --- 1a. header scale ------------------------------------------------------
+   Every dimension of this bar matched Terminal's exactly — 14px/450 type, 18px
+   gaps, 18px bar padding, 78px tall, verified down to a 10.2px cap height on
+   both sides. It still read smaller, and it read smaller for a real reason:
+   matching their numbers is not the same as matching their presence when the
+   content is different. They carry five short English words and a compact
+   icon-plus-one-word logo; we carry seven longer Danish ones next to a
+   two-word wordmark that is nearly twice as wide. At their type size the menu
+   gets visually squeezed between a heavy logo and a heavy button.
+
+   So the bar is scaled up ~20% from theirs. Checked by rendering 1.0 / 1.12 /
+   1.22 / 1.32 side by side under a screenshot of their own bar and looking at
+   them, not by comparing tables — the tables were what said it already matched.
+   ------------------------------------------------------------------------- */
+header nav ul li a,
+header nav ul li button {
+  font-size: 17px;
+  letter-spacing: 0.5px;
+  padding-top: 17px;
+  padding-bottom: 17px;
+}
+
+header nav ul { gap: 22px; }
+
+/* Their own rules are scoped with [data-v-bb6830dc], which outranks a plain
+   descendant selector — the first version of these two silently did nothing.
+   Matching the attribute puts us on equal specificity and later in the file. */
+header .cta-button[data-v-bb6830dc] {
+  font-size: 13px;
+  letter-spacing: 1.8px;
+  padding: 11px 25px;
+}
+
+header .phone-trigger[data-v-cafe0bfb] {
+  width: 48px;
+  height: 48px;
+}
+
+/* --- 1b. the wordmark ------------------------------------------------------
+   Their logo is an icon plus one word, so eight glyphs fill the 96px their CSS
+   allows. Ours is fourteen glyphs; at the same width the cap height came out
+   9px against their 17px, which is most of why the header read small. Sized to
+   their cap height instead of their box, so the two bars carry the same weight.
+   Cap height of SuisseIntl is ~0.72em, so 23px type gives ~16.5px caps. */
+.brand-wordmark {
+  display: block;
+  font-family: var(--font-primary, SuisseIntl), sans-serif;
+  font-size: 26px;
+  font-weight: 300;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: currentColor;
+}
+
+.brand-wordmark b { font-weight: 600; }
+
+.logo-link:hover .brand-wordmark { color: var(--c-lime, #2b5fbf); }
+
+/* =========================================================================
+   2. the hero stage: still image instead of the canvas frame sequence
+
+   Their runtime tree, read off the live page (qa/t10-herotree.mjs):
+
+     section.video-carousel          overflow:clip, background:var(--c-white)
+       div.wrapper                   relative, full section height
+         div.video-sequence-scroll
+           div.video-sequence-background      absolute, inset 0
+             div.sequence-background-wrapper  position:sticky; top:0; height:100vh
+           div.content > div.content-sizer    height:300svh  <- sets the section height
+       div.homepage-scroll-content   absolute, inset 0
+         div.content                 position:sticky; top:0; height:100svh
+
+   Only `.wrapper > span` and `.homepage-scroll-content` exist in the SSR HTML —
+   everything between is built by their VideoSequence component. So the two SSR
+   elements take the jobs of the two that matter:
+
+     .wrapper       -> .video-sequence-background  (absolute, inset 0)
+     .wrapper > span -> .sequence-background-wrapper (sticky, top 0, 100svh)
+
+   This replaces an earlier version that made `.wrapper` itself the sticky stage
+   and parallaxed IT. That was wrong in a way you could see: pushing a sticky
+   element down inside an overflow-clip section opens a gap at the top of the
+   screen, which filled with the section's background and grew as you scrolled.
+   Their parallax moves the INNER sticky stage, and only over the section's last
+   viewport — see heroExit() in js/app.js.
+   ========================================================================= */
+
+/* Their sizer is 300svh because 410 frames need somewhere to scrub. A still has
+   nothing to scrub, and two full screens of scroll on a static picture is just a
+   page that will not move on.
+
+   106svh. The 6 exists for ONE reason: at exactly 100svh the white notch of the
+   section below peeked over the bottom edge on load, so the page arrived with
+   its second section already showing. The 6svh buffer parks that below the fold
+   at rest and nothing else — the hand-off still spans the whole section, so it
+   still begins on the first pixel of scroll. js/app.js `heroExit` is scrubbed
+   across exactly this range.
+
+   (At 130svh the first third of the scroll was a dead hold: you turned the
+   wheel and the page waited. That is what this replaced.) */
+.video-carousel {
+  height: 106svh;
+  height: calc(var(--svh, 1svh) * 106);
+}
+
+/* stands in for .video-sequence-background */
+.video-carousel > .wrapper {
+  position: absolute;
+  inset: 0;
+}
+
+/* stands in for .sequence-background-wrapper — same sticky geometry, same #000
+   backstop, with our still in place of their canvas */
+/* absolute, not sticky, and full-section height. Sticky pinned the stage for
+   the section's extra 6svh and then released it, which is a different motion
+   regime from the copy layer beside it — the two desynced the moment heroExit
+   counter-translated them. And at 100svh inside a 106svh section, a stage
+   drifting up at 10% of scroll speed exposed a white strip under the photo
+   during the hand-off; 100% always reaches the section's bottom edge. */
+.video-carousel > .wrapper > span {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  background-image: url("../media/hero.jpg");
+  background-size: cover;
+  /* The plate is square and the window is 16:10, so 540px of it gets cropped away
+     and this number decides which 540. Low value = keep the top of the plate.
+
+     Picked by rendering 30 / 38 / 44 / 50 and looking at all four, after 30 was
+     too far: it left a wide empty sky, pushed the house down under the header
+     and cut the grass foreground to almost nothing. 44 is the balance — clear
+     air above the roof, the whole house in frame, and a real band of lawn
+     underneath for the copy to sit against. */
+  background-position: center 44%;
+  background-repeat: no-repeat;
+}
+
+/* Their frame sequence ends on a near-black plate, so their headline always sits
+   on dark. A photograph does not, so this rebuilds the same contrast — and since
+   the copy is left-aligned, the weight is on the LEFT, not the bottom. The house
+   sits right of centre and stays clear. */
+.video-carousel > .wrapper > span::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    /* protects the copy column */
+    linear-gradient(90deg, rgba(13,28,46, 0.66) 0%, rgba(13,28,46, 0.44) 28%,
+                           rgba(13,28,46, 0.14) 52%, rgba(13,28,46, 0) 72%),
+    /* keeps the header legible against a bright sky */
+    linear-gradient(180deg, rgba(13,28,46, 0.38) 0%, rgba(13,28,46, 0) 20%),
+    /* Settles the frame into the section below. Was 0.5 over the bottom 30%,
+       which swallowed the lawn and the base of the house — the photo lost its
+       foreground and read as if it had been cropped away. Half the strength
+       over half the distance keeps the grass. */
+    linear-gradient(0deg, rgba(13,28,46, 0.28) 0%, rgba(13,28,46, 0) 16%);
+}
+
+/* =========================================================================
+   3. the hero copy
+
+   Their `.content` is already sticky / 100svh / flex / bottom-aligned and stays
+   exactly as it is. What changes is what sits inside it: they run three
+   absolutely-positioned headlines that the frame sequence swaps between, we run
+   one copy block — headline, sub-line, address check.
+   ========================================================================= */
+
+/* Their layer is pointer-events:none because nothing in it is clickable. Ours
+   holds a text field and a button, so input has to reach it. */
+.video-carousel .homepage-scroll-content { pointer-events: none; }
+.video-carousel .hero-copy {
+  pointer-events: auto;
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  user-select: auto;
+  touch-action: auto;
+}
+
+/* Theirs is bottom-aligned and centred, because their headline is the only thing
+   on the plate. Ours is a left column sitting just above the middle: the copy
+   gets the calm left side of the frame and the house stays uninterrupted.
+   The 70px gutter is Terminal's own — their product cards and FAQ heading both
+   start at x=70 at 1440 (measured), so the hero lines up with the page. */
+.video-carousel .content {
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 70px;
+  /* Theirs is position:sticky. Ours must move exactly like the stage behind it
+     so ONE counter-tween in heroExit can hold both of them nearly still while
+     the section below slides over the top. Left sticky, the copy pinned for the
+     section's extra 6svh and then left at full scroll speed — which is exactly
+     what Patrick rejected ("it should just get overlapped"). */
+  position: relative !important;
+}
+
+/* ONE column, ONE edge. The block used to stack three different widths — the
+   headline at 620px, the sub-line at 34ch (~450px) and the address check at
+   520px — so nothing below the headline lined up with anything else and the
+   whole column read as slightly out of true. Everything is one width now and
+   the children are all width:100% of it.
+
+   That width was 560px, wrapping "Danmarks første bunker" a third time
+   inside itself at the original 72px font-size (736px unwrapped, wider than
+   the column). First fix widened the column to 780px instead of touching the
+   font — technically two lines, but Patrick's read on the deployed build was
+   "way too wide, way too big... goes over the house". 780px was genuinely too
+   far right for a left-anchored premium hero. Second pass (2026-08-19)
+   changes the actual lever: font down, not column up. 620px/56px keeps the
+   block clear of the house at every width tested (1440 and 1990, right edge
+   at 690px either way) while still holding two lines. */
+.hero-copy {
+  width: min(620px, 100%);
+  text-align: left;
+  color: var(--c-white, #fff);
+  /* Centred vertically leaves the block's optical centre at 49% of the frame,
+     which strands a third of the lawn empty underneath it. This lands it near
+     56% — the usual place for hero copy, low enough to feel planted, high
+     enough that the field below still reads as foreground. In vh rather than a
+     percentage of the block so it holds as the copy or the window changes. */
+  transform: translateY(6vh);
+}
+
+/* Their hero type is min(5.729vw, 146.67px) over three English lines. First
+   pass kept that scale (min(4.9vw,72px), sized for two Danish lines at 1440
+   only by coincidence of the container being wide enough) — Patrick called it
+   too big and disruptive against the house photo. Dropped a full size class,
+   3.8vw/56px, which is what actually let the column narrow back down without
+   the headline wrapping a third time. */
+.hero-copy h1 {
+  margin: 0;
+  font-family: var(--font-primary, SuisseIntl), sans-serif;
+  font-size: min(3.8vw, 56px);
+  font-weight: 400;
+  /* 0.96 pulled the two lines into each other at this size — the descender of
+     "g" in "egen" ran into the cap of the second line. 1.02 is the smallest
+     that keeps them apart and still reads as one block. */
+  line-height: 1.02;
+  letter-spacing: min(-0.07vw, -1.8px);
+  text-wrap: balance;
+  /* Their headline sits on a near-black plate and needs nothing. Ours crosses a
+     white gable, so it gets the least shadow that holds the edge — wide, soft
+     and dark-green, so it reads as depth rather than as a drop shadow. */
+  text-shadow: 0 2px 28px rgba(13,28,46, 0.45);
+}
+
+.hero-copy .hero-sub {
+  margin: 1.25rem 0 0;
+  max-width: 100%;              /* one column, one edge — see .hero-copy */
+  font-family: var(--font-primary, SuisseIntl), sans-serif;
+  font-size: 1.3125rem;
+  font-weight: 400;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 18px rgba(13,28,46, 0.5);
+}
+
+/* The address check. Same 8px radius, same lime primary and the same Geist Mono
+   label as their header CTA, one size up — it is the page's main action. */
+.hero-check {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;                  /* one column, one edge — see .hero-copy */
+  margin: 2rem 0 0;
+}
+
+.hero-check input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 54px;
+  padding: 0 1.1875rem;
+  font-family: var(--font-primary, SuisseIntl), sans-serif;
+  font-size: 1rem;
+  font-weight: 450;
+  color: var(--c-white, #fff);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 8px;
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.hero-check input::placeholder { color: rgba(255, 255, 255, 0.6); }
+
+.hero-check input:hover { border-color: rgba(255, 255, 255, 0.5); }
+
+.hero-check input:focus {
+  outline: none;
+  border-color: var(--c-lime, #2b5fbf);
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.hero-check button {
+  flex: 0 0 auto;
+  height: 54px;
+  padding: 0 1.75rem;
+  font-family: var(--font-mono, "Geist Mono"), monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--c-dark-green, #0d1c2e);
+  background: var(--c-lime, #2b5fbf);
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: color 0.3s cubic-bezier(0.39, 0.575, 0.565, 1),
+    background-color 0.3s cubic-bezier(0.39, 0.575, 0.565, 1);
+}
+
+/* Button hover, Terminal's language, not ours.
+   Their whole site answers a hover on a filled button ONE way: the fill drops to
+   the dark green and the label goes lime, over 0.3s cubic-bezier(.39,.575,.565,1)
+   (their --hover-bg / --hover-color pair, read off the live site). We had
+   filter: brightness(1.08) on four buttons - a shorthand that appears nowhere in
+   their stylesheet and reads as a flat wash instead of a colour swap. The lime
+   fill stays ours; only the hover MECHANISM is theirs. */
+.hero-check button:hover {
+  background: var(--c-dark-green, #0d1c2e) !important;
+  color: var(--c-lime, #2b5fbf) !important;
+}
+
+.hero-check button:active { filter: brightness(0.94); }
+
+.hero-fine {
+  margin: 0.875rem 0 0;
+  font-family: var(--font-mono, "Geist Mono"), monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.58);
+}
+
+/* Entrance. Their headline arrives character by character, driven by the frame
+   sequence; with a still there is nothing to drive it, so the block rises in
+   once on load. Deliberately a CSS animation rather than JS: an animation always
+   runs to its end state, so a script failure can never leave the hero blank. */
+@keyframes hero-rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.hero-copy > * {
+  animation: hero-rise 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.hero-copy > :nth-child(1) { animation-delay: 0.15s; }
+.hero-copy > :nth-child(2) { animation-delay: 0.3s; }
+.hero-copy > :nth-child(3) { animation-delay: 0.42s; }
+.hero-copy > :nth-child(4) { animation-delay: 0.52s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-copy > * { animation: none; }
+}
+
+/* --- 4. the demo toast ----------------------------------------------------
+   The address check has no DAWA lookup and no lead mail behind it yet, so a
+   submit says so instead of inventing a verdict. Same behaviour, and the same
+   wording, as the first preview Magnus reviewed. */
+.demo-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 2rem;
+  z-index: 200;
+  max-width: min(520px, 90vw);
+  padding: 0.875rem 1.25rem;
+  font-family: var(--font-primary, SuisseIntl), sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  text-align: center;
+  color: var(--c-white, #fff);
+  background: var(--c-dark-green, #0d1c2e);
+  /* It lands over the hero's own dark scrim, where a dark card with no edge just
+     disappears. The border and the lime rule are what make it read as a card. */
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-top: 2px solid var(--c-lime, #2b5fbf);
+  border-radius: 10px;
+  box-shadow: 0 12px 44px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transform: translate(-50%, 14px);
+  pointer-events: none;
+  transition: opacity 0.28s, transform 0.28s;
+}
+
+.demo-toast.is-on {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* phone: the headline has to come down a step or the two lines fill the screen,
+   and the field and button stack rather than squeeze */
+@media (max-width: 767px) {
+  /* the square plate cropped to a phone frame cuts the house in half on a
+     centred crop — pushing the window right keeps the whole house in shot */
+  .video-carousel > .wrapper > span { background-position: 72% 55%; }
+  .hero-copy h1 { font-size: min(11vw, 46px); }
+  .hero-copy .hero-sub { font-size: 1.0625rem; margin-top: 1.125rem; }
+  .hero-check { flex-direction: column; margin-top: 1.75rem; }
+  .hero-check button { width: 100%; }
+  .video-carousel .content { padding-bottom: 7vh; }
+}
+
+/* =========================================================================
+   6. the four sticky beats
+
+   Their media panel holds four looping mp4s. Ours holds four stills from the
+   bunker sequence in the preview Magnus reviewed, swapped into the same
+   `.media-el` slots, so their step engine drives them unchanged. Only the tag
+   changed from <video> to <img>, which needs the object-fit their video had.
+   ========================================================================= */
+.features-steps .media-el img.video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The scroll cursor owns the character colour.
+
+   Their stylesheet carries TWO reveals for the same characters: a per-character
+   one (`.split-chars.show`) and a per-step one
+   (`.scroll-item.show .split-chars`, which darkens every character of the active
+   beat after its own --v-delay). Their component drives the first; the second
+   would run straight over it and darken the whole paragraph the moment its step
+   became active, so the letters would never follow the wheel.
+
+   This holds any character the cursor has not reached at the resting grey. */
+.features-steps .scroll-item.show:not([style*="--index:0"]) .split__wrapper .split-chars:not(.show) {
+  color: var(--c-light-light-gray, #ddd);
+  animation: none;
+  transition: color 0.25s;
+}
+
+/* Beat 1 is dark from the first paint, and no scroll position can undo it.
+
+   It used to be filled by an approach trigger, which meant it could always be
+   caught halfway — fast scroll, a resize, a refresh mid-section — and half a
+   grey paragraph is what Patrick kept seeing. Painting it in the stylesheet
+   removes the failure mode entirely. The lime sweep still runs across it (the
+   .show keyframe animates colour on its own), so you still get the green
+   typing; it just goes dark-to-dark instead of grey-to-dark. */
+.features-steps .scroll-item[style*="--index:0"] .split__wrapper .split-chars {
+  color: var(--c-dark-green, #0d1c2e);
+}
+
+/* The frames STACK rather than swap (js/app.js setStep): every frame up to the
+   current one stays on and the new one fades in over the top. Their own
+   `.image { transition: opacity .5s var(--ease-out) }` does this for their
+   video elements; ours are img swaps in the same slots, so the transition is
+   declared for them too. Without it the last beat ends on a hard cut. */
+.features-steps .media-el {
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* NO section-eyebrow rule here, deliberately.
+
+   There was one, and it was the bug. Measured on the live site at 1990, their
+   section eyebrow is 20px SuisseIntl, weight 400, sentence case, rgb(194,194,194),
+   32px below — a quiet full-size line. The rule that used to sit here styled it
+   as 13px Geist Mono uppercase, which is their CARD eyebrow treatment applied to
+   the wrong element, and because replica.css loads last it BEAT their correct
+   20px. So "the eyebrow is too small" was us, three times over.
+
+   Their own stylesheet already delivers all of it. The fix is to declare
+   nothing and let it. */
+
+/* Bunkeren's introduction is a heading with no paragraph now (personalise.py):
+   the four beats below it are the paragraph. Their padding assumes a block with
+   text in it, so without this the heading is followed by two stacked paddings
+   of empty screen before the first beat arrives. */
+#bunkeren .section-introduction { padding-bottom: 0; }
+#bunkeren + .features-steps,
+.features-steps { padding-top: 0; }
+
+/* =========================================================================
+   7. their savings panel as the mid-page CTA
+
+   It is NOT a price section and never was. The middle of a one-page site is
+   where the reader either acts or leaves, so the left column is the ask and the
+   right column is the address field that answers it. A price figure sat here
+   for one run and it was wrong twice over: it made the panel a table instead of
+   an action, and it put the number in front of people who have not been told
+   what they are buying yet. It lives in the FAQ now, once.
+
+   The field and button are Terminal's own in-panel CTA pattern — underline
+   input, solid lime button (.roi-calculator__cta-* in their stylesheet), rebuilt
+   on our classes rather than restyled in place.
+   ========================================================================= */
+
+/* The ask is a headline, not a sentence. It was set at their title-h2 scale and
+   ran three lines wide, which is why the whole section read as lightweight for
+   the most important panel on the page. Their title-si scale, one step down. */
+.price-lead {
+  max-width: 16ch;
+  margin: 0 0 1.5rem;
+  text-wrap: balance;
+  font-size: max(2.5rem, min(3.2vw, 82px));
+  line-height: 1.05;
+  letter-spacing: min(-0.06vw, -1.6px);
+}
+
+.price-body {
+  max-width: 34ch;
+  margin: 0;
+  opacity: 0.72;
+  text-wrap: pretty;
+  /* their body-1 scale, same as the section intros — both halves of it, see the
+     note there. At body-4's 18px it sat under an 80px headline as a footnote. */
+  font-size: min(1.4375rem, 5.897vw);
+  line-height: 1.45;
+}
+
+@media (min-width: 1024px) {
+  .price-body { font-size: min(1.198vw, 30.67px); }
+}
+
+/* The ask column holds two elements against a 736px panel, so left to itself it
+   stacked at the top and left two thirds of its own column empty — the
+   lopsided wireframe Patrick flagged. Centre it against the panel instead. */
+@media (min-width: 1280px) {
+  .roi-calculator__form {
+    justify-content: center;
+    padding-right: 3rem;
+  }
+}
+
+/* the right column sits on their dark green panel, so this half is light on
+   dark — the tokens are theirs */
+.cta-panel__label {
+  margin: 0 0 2rem;
+  font-family: var(--font-mono, "Geist Mono"), monospace;
+  text-transform: uppercase;
+  color: var(--c-lime, #2b5fbf);
+}
+
+/* Their results panel measures 866 x 736 on the live site, because a whole
+   calculator lives in it. Ours holds four short elements, so it rendered as a
+   short wide strip that matched nothing else on the page. Give the column their
+   height and spread the content into it: label at the top, the ask in the
+   middle, the fine print at the bottom. */
+.roi-calculator__results-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: min(46rem, 74svh);
+}
+
+.cta-panel__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  /* the results column is a stretch-aligned flex child; without this the form
+     and its button fill the panel edge to edge and read as a banner */
+  align-items: flex-start;
+  align-self: stretch;
+  justify-content: center;
+  flex: 1 1 auto;
+}
+
+.cta-panel__field { width: 100%; }
+
+.cta-panel__field input {
+  width: 100%;
+  padding: 0.25rem 0 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--c-white, #fff);
+  font-family: var(--font-primary, SuisseIntl), sans-serif;
+  font-size: 1.375rem;
+}
+
+.cta-panel__field input::placeholder { color: rgba(255, 255, 255, 0.45); }
+.cta-panel__field input:focus { outline: none; }
+
+.cta-panel__line { height: 1px; background: rgba(255, 255, 255, 0.3); }
+.cta-panel__field:focus-within .cta-panel__line { background: var(--c-lime, #2b5fbf); }
+
+.cta-panel__button {
+  height: 3.625rem;
+  width: 13.25rem;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 0.5rem;
+  background: var(--c-lime, #2b5fbf);
+  color: var(--c-dark-green, #0d1c2e);
+  font-family: var(--font-mono, "Geist Mono"), monospace;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1.8px;
+  cursor: pointer;
+  transition: color 0.3s cubic-bezier(0.39, 0.575, 0.565, 1),
+    background-color 0.3s cubic-bezier(0.39, 0.575, 0.565, 1);
+}
+
+.cta-panel__button:hover {
+  background: var(--c-dark-green, #0d1c2e);
+  color: var(--c-lime, #2b5fbf);
+}
+
+.cta-panel__fine {
+  margin: 0.5rem 0 0;
+  font-family: var(--font-mono, "Geist Mono"), monospace;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 767px) {
+  .price-lead { max-width: none; margin-bottom: 1.25rem; }
+  .cta-panel__button { width: 100%; }
+}
+
+/* =========================================================================
+   8. the footer's circuit traces
+
+   Their PathBackground runs a light pulse along each trace with a glow riding
+   it, using two paid GSAP plugins (DrawSVG, MotionPath). The same two effects
+   with plain CSS: a dash pattern walked along the stroke, and the glow on an
+   offset-path. Geometry is generated in js/app.js — their markup ships the
+   paths degenerate, because their component builds them at runtime.
+   ========================================================================= */
+/* Travel and fade are two separate animations now, because they run on two
+   different curves and one keyframe set can only carry one. Both are measured
+   off the live site, sampled every frame across four cycles
+   (qa/ref-trace-time.mjs, 2026-08-18):
+
+   travel  power2.inOut - 12.9% of the path covered at a quarter of the cycle,
+           50.6% at half, 87.2% at three quarters. Creeps, accelerates, eases
+           out. Ours was linear.
+   fade    in over the first 16.7% of the cycle on an ease-in, flat until 86%,
+           then out by 94.5%. It never pops on and never snaps off, which is
+           what Patrick spotted: "they fade out at the end, they don't just
+           disappear... it looks like they fade in as well." */
+@keyframes trace-run {
+  from { stroke-dashoffset: var(--trace-len); }
+  to   { stroke-dashoffset: 0; }
+}
+
+@keyframes trace-blob {
+  from { offset-distance: 0%; }
+  to   { offset-distance: 100%; }
+}
+
+@keyframes trace-fade {
+  0%          { opacity: 0; animation-timing-function: cubic-bezier(0.55, 0.085, 0.68, 0.53); }
+  16.7%       { opacity: 1; animation-timing-function: linear; }
+  86%         { opacity: 1; animation-timing-function: cubic-bezier(0.55, 0.085, 0.68, 0.53); }
+  94.5%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .path-background path { animation: none !important; }
+}
+
+/* The card photo slot is VISIBLE again, and there is no rule for it here.
+
+   It was hidden for a run because the placeholder read as an unfinished page.
+   Hiding it was worse: their card is built as text / 16:10 media / button, and
+   with the middle third gone the whole grid lost the proportions the rest of
+   the page is measured against — which is what "this CSS is completely off"
+   was pointing at. It comes back with the placeholder in it until Magnus sends
+   photographs, because a placeholder in the right shape beats a right image in
+   the wrong shape.
+
+   The flex/height workaround that used to sit here is gone too: it existed only
+   to re-align buttons after the media was removed, and it fought their own
+   `.product-grid__card { display:flex; flex-direction:column; gap:2rem }`.
+
+   TODO(Magnus): one photograph per selling point. */
+
+/* Om os ships as a heading-only introduction block in their markup, so its
+   paragraph is one we add (personalise.py). Their own paragraphs sit inside a
+   width-constrained header; a bare one stretched the full 1990px as a single
+   line. Same measure as their intro column. */
+/* Their intro paragraph runs at the body-1 scale, not body-4's flat 18px, which
+   under a 93px heading read as a caption rather than as the section's own text.
+
+   body-1 is TWO formulas, and both are needed: min(1.4375rem, 5.897vw) below
+   1024, min(1.198vw, 30.67px) above. Shipping only the desktop one renders
+   1.198vw on a phone — 4.7px at 390 wide, i.e. invisible. Caught by looking at
+   a mobile screenshot, not by any check. */
+.section-introduction .paragraph {
+  max-width: min(56.25rem, 90%);
+  margin: 1.5rem auto 0;
+  text-align: center;
+  text-wrap: pretty;
+  font-size: min(1.4375rem, 5.897vw);
+  line-height: 1.45;
+}
+
+@media (min-width: 1024px) {
+  .section-introduction .paragraph { font-size: min(1.198vw, 30.67px); }
+}
+
+.section-introduction .paragraph + .paragraph { margin-top: 0.875rem; }
+
+/* =========================================================================
+   8a. Kontakt eyebrow (copy run, 2026-08-18)
+   ========================================================================= */
+/* Kontakt's own scoped CSS makes any bare .label white -
+   `.form-wrapper--dark[data-v-aa63f445] .label { color: var(--c-white) }` -
+   because that rule is meant for the dark form panel's own field labels
+   ("Navn", "Adresse"...), but it applies to the WHOLE .form-wrapper--dark
+   container, which also wraps the light-background left info column. Our
+   new "Kontakt" eyebrow sits in that left column and inherited the dark-
+   panel rule, rendering white on white — invisible. This gives it its own
+   explicit color instead, matching every other section's eyebrow (grey,
+   sentence case, no mono/uppercase treatment). */
+.kontakt-eyebrow {
+  display: block;
+  color: var(--c-light-gray, #c2c2c2);
+  font-family: var(--font-primary), sans-serif;
+  font-weight: 400;
+  text-transform: none;
+  opacity: 1;
+  margin-bottom: 1rem;
+}
+
+/* =========================================================================
+   8b. the quote panel
+   ========================================================================= */
+
+/* A full viewport, which is what theirs measures (1990x1160 at 1990 wide).
+   Shrinking it to 72svh for a run is what made it read as a narrow band
+   squeezed between two sections instead of a moment in the page. */
+.big-image-content {
+  height: 100svh !important;
+  height: calc(var(--svh, 1svh) * 100) !important;
+}
+
+/* Their quote panel carries NO scrim — their photograph is nearly black on its
+   own. Ours is a bright daylight render, so the same white text sat on a pale
+   sky and disappeared. This wash stands in for a darker photograph, and comes
+   out the day Magnus sends one. Flat base + a centre lift so the text has its
+   own pool of dark. */
+.big-image-content::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 75% 65% at 50% 40%, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 70%),
+    linear-gradient(rgba(3, 14, 14, 0.55), rgba(3, 14, 14, 0.55));
+  pointer-events: none;
+}
+
+/* their live values: 2.396vw at line-height 0.96. The weight was set to 450
+   here from a misread of their type scale; the live element computes 400
+   (qa/parity.mjs, 2026-08-18), so the declaration is gone and their own
+   stylesheet decides. */
+.quote-text {
+  /* The floor matters: min(2.396vw, ...) alone lands on 9.3px at 390 and the
+     quote became unreadable on a phone (qa/parity.mjs @390). Theirs computes
+     32px there and 2.396vw above it, which is exactly max(2rem, ...). */
+  font-size: max(2rem, min(2.396vw, 61.33px)) !important;
+}
+
+/* 0.96 is their DESKTOP leading. On a phone theirs opens back up to 1.2, and
+   holding 0.96 there jammed the three lines of the quote together. */
+@media (min-width: 1024px) {
+  .quote-text { line-height: 0.96 !important; }
+}
+
+.quote-block { position: relative; z-index: 2; }
+
+/* Their attribution is a grey on a dark plate. Ours is on a photograph with a
+   bright sky in it, where the same grey disappears. */
+.quote-block .name { color: var(--c-white, #fff); font-weight: 450; }
+.quote-block .role { color: rgba(255, 255, 255, 0.72); font-weight: 450; }
+
+/* =========================================================================
+   8c. kontakt: the text and the form belong to each other
+   ========================================================================= */
+
+/* Their grid centres a 600px text column inside a 1fr cell, which at 1990 puts
+   a trench of empty screen between the sentence and the field it is telling you
+   to fill in. Pull the text to the inside edge and give the form the wider half
+   — it is the thing being used. */
+@media (min-width: 1024px) {
+  .form-content {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr) !important;
+    gap: 2rem !important;
+  }
+  .form-info-column {
+    justify-self: end !important;
+    max-width: 34rem !important;
+  }
+  /* one step up from their 23px: at their size this column is a caption beside
+     the form rather than the reason to fill it in */
+  .form-info p,
+  .form-info li > p { font-size: 1.625rem !important; line-height: 1.3; }
+}
+
+/* The FAQ's left column is a heading and one line, which on their wide
+   two-column accordion leaves half the section empty. This is the way out for
+   anyone whose question is not in the list. */
+.faq-more {
+  display: inline-block;
+  margin-top: 1.5rem;
+  color: var(--c-dark-green, #0d1c2e);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.faq-more:hover { color: var(--c-lime, #2b5fbf); }
+
+/* =========================================================================
+   9. the footer's own content
+
+   Their footer carries four things we do not: a Gartner award block, their
+   social accounts, their agency credit and a four-column link tree. Those are
+   cut in personalise.py. What is left needs two corrections.
+   ========================================================================= */
+
+/* The scrim that darkens the page as the footer slides up only exists on
+   desktop — their own CSS declares `opacity: 0` for it inside the
+   min-width:1024px block and nowhere else, and relies on the `--static` class
+   to hide it below that. Dropping `--static` to switch the reveal on therefore
+   left a full-strength black sheet over the whole phone layout. */
+@media (max-width: 1023px) {
+  .overlay-sticky__wrapper { display: none; }
+}
+
+/* The override that used to live here (display:block + 6px below each contact
+   link) existed only because the networks block had been cut and the two links
+   ran together on one line. The block is back, so their own layout - inline-
+   block links with the spacing coming from the call-line under them - is
+   correct again and this rule is gone. */
+
+/* The last action on the page. Theirs is a quiet outlined link because their
+   footer already holds three CTAs above it; ours is the only one down here, so
+   it carries the same lime as every other "tjek din grund" on the page. */
+.footer .button-tilt[data-v-d0493d08] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Terminal's own 25px / 50px. Ours shipped at 16/28 and read as a link with a
+     background rather than as the last action on the page. */
+  padding: 1.5625rem 3.125rem;
+  /* Their button measures 306x59 because their label runs 24 characters; ours
+     runs 14 and came out 220px, so with identical padding it still read as the
+     lighter of the two. The min-width gives it their footprint without
+     stretching the copy. */
+  min-width: 19.125rem;
+  /* !important because their own rule is prop-driven: the component writes the
+     ghost-button background (#FFFFFF26) into a scoped rule we cannot outrank by
+     specificity alone. A ghost button works in their footer, which already has
+     three CTAs above it; this is the only one on ours. */
+  color: var(--c-dark-green, #0d1c2e) !important;
+  background: var(--c-lime, #2b5fbf) !important;
+  border-radius: 8px;
+  transition: color 0.3s cubic-bezier(0.39, 0.575, 0.565, 1),
+    background-color 0.3s cubic-bezier(0.39, 0.575, 0.565, 1);
+}
+
+.footer .button-tilt[data-v-d0493d08]:hover {
+  background: var(--c-dark-green, #0d1c2e) !important;
+  color: var(--c-lime, #2b5fbf) !important;
+}
+
+/* The form's own send button, same reasoning as the footer CTA: theirs is a
+   white-30% ghost because their dark form sits inside a page full of buttons.
+   Ours is the one place a lead can actually be submitted, so it gets the lime.
+   It also shipped `disabled` — their Vue enables it on validation and nothing
+   here ever would (see personalise.py). */
+.form-wrapper .button-send {
+  background: var(--c-lime, #2b5fbf) !important;
+  color: var(--c-dark-green, #0d1c2e) !important;
+  cursor: pointer;
+  transition: color 0.3s cubic-bezier(0.39, 0.575, 0.565, 1),
+    background-color 0.3s cubic-bezier(0.39, 0.575, 0.565, 1);
+}
+
+.form-wrapper .button-send:hover {
+  background: var(--c-dark-green, #0d1c2e) !important;
+  color: var(--c-lime, #2b5fbf) !important;
+}
+
+/* their underline sweep belongs to a text link, not to a filled button */
+.footer .button-tilt[data-v-d0493d08] .--line::after { display: none; }
+
+/* The footer carries their mark on its own 203x45 SVG, so the wordmark needs its
+   own size there — the header's 26px would tower over the footer's link lists. */
+.brand-wordmark--footer {
+  /* their mark renders 168 x 37px down here; at 28px our wordmark was visibly
+     lighter than everything rebuilt around it */
+  font-size: 34px;
+  color: var(--c-white, #fff);
+  text-decoration: none;
+}
+
+/* Footer type pinned to Terminal's own LIVE computed values, measured at 1990:
+   links and contact lines 20px, column labels 11px with 32px under them,
+   copyright 12px. This is the third run of "the footer is too small", so these
+   are unconditional rather than trusting the scoped cascade to land. */
+@media (min-width: 1024px) {
+  .footer .links-list a,
+  .footer .i-links a {
+    font-size: 1.25rem !important;
+    line-height: 1.46;
+    letter-spacing: -0.0125rem;
+  }
+  .footer .contact-link,
+  .footer .contact-text {
+    font-size: 1.25rem !important;
+    line-height: 1.46;
+  }
+  .footer .label.label-4 { font-size: 0.6875rem; margin-bottom: 2rem; }
+  .footer .copyright { font-size: 0.75rem; }
+}
+
+/* Run-3 correction. An earlier run cut the footer's air to min(9vw,230px) on
+   the theory that Terminal's own padding only looks right because a Gartner
+   block, a social row and an agency credit fill it. Measured on the live site,
+   that was wrong twice over: their padding-top is 225px at 1440 and 311px at
+   1990, and all three of those blocks sit INSIDE .content-wrapper, below the
+   padding — the padding is pure air on their site too. Cutting it took 95px
+   (1440) / 132px (1990) out of the footer and is the actual reason the block
+   read undersized while every type size already matched theirs to the pixel.
+   The override is gone; Terminal's own value applies. */
+
+/* The footer headline breaks on its own width, and at 1440 ours landed
+   "Se hvad din grund kan / bære." — a two-word orphan with the bold word
+   stranded at the line end. Their headline breaks evenly across two lines,
+   which is what balance gives us here. */
+.footer .footer-title h1 { text-wrap: balance; }
+
+/* Footer headline, too big (2026-08-19). Terminal's own formula —
+   max(4.375rem, min(4.688vw,120px)) — floors at 70px and holds there below a
+   ~1493px viewport, which is what we were shipping unmodified. Correctly
+   copied, but "Se hvad din grund kan bære." is longer than whatever short
+   English line they sized that floor for, so at the same size it dominates
+   the panel the way the hero headline did before that got the same
+   treatment. Capped lower, same clamp shape. */
+.footer .footer-title h1 {
+  font-size: min(3.5vw, 52px);
+}
+
+
+/* =========================================================================
+   Footer placeholder tiles (2026-08-18)
+   =========================================================================
+   The award tile and the three social icons are slots Terminal fills with
+   real assets and we cannot: Bunker Danmark has no award and no accounts
+   yet. They render as the build's grey placeholder images, which at full
+   strength read as broken images rather than as open TODOs. Dimming them
+   keeps the frame Patrick asked to copy without the footer looking faulty.
+   Delete this block the moment Magnus supplies either. */
+.footer .gartner-logo,
+.footer .networks-list img {
+  opacity: 0.35;
+}
+.footer .gartner-logo { width: 86px; height: auto; }
+
+
+/* =========================================================================
+   Beats: the step counter sits where theirs does (2026-08-18)
+   =========================================================================
+   Their component writes this margin inline on the odometer and our build
+   never carried the inline style, so the counter sat 200px too high and the
+   whole step header measured 49px against their 251px. The expression is
+   theirs verbatim; --font-size and the vw term resolve identically in our
+   build, which is why the computed value lands on their 222.7px. */
+.features-steps .header .odometer {
+  /* Their base is not the fixed 248px it looks like at 1440 - their component
+     writes 343px at 1990, 248px at 1440 and 216px at 390, which is 17.23vw
+     with a 216px floor (343/1990 and 248/1440 both land on .1723, and 390
+     would give 67px so the floor takes over). Measured at all three widths
+     with qa/odo.mjs. */
+  margin-bottom: calc(max(216px, 17.23vw) - var(--font-size) - min(2.396vw, 61.3333333333px) * 0.45);
+}
+
+
+/* =========================================================================
+   The hero never paints over the section coming across it (2026-08-18)
+   =========================================================================
+   Patrick: "the flaps are transparent". They were not - the hero's own copy
+   was painting ON TOP of them. Our hand-off slides section 2 UP INTO the
+   hero's box, so the white notch band is drawn inside the hero's area, and
+   there the copy won on z-index: .hero-copy carried z-index 3 and it is
+   transformed, which makes a static element take part in stacking. The
+   address field and its button therefore drew straight over the white flap
+   and read as if the flap were see-through.
+
+   The z-index 3 is gone, and the hero is isolated so nothing inside it can
+   ever out-stack a later section again: isolation makes every z-index in
+   there local, and the sections after it - later in the document, same
+   stacking level - paint on top by document order, which is what the whole
+   overlap depends on. Theirs never needed this because their copy is released
+   before their separator arrives; ours is deliberately still on screen. */
+.video-carousel {
+  isolation: isolate;
+}
+
+/* =========================================================================
+   Composition sweep, 2026-08-19: three sections read thin or cramped
+   =========================================================================
+   Patrick, looking at the deployed build: hero headline on three lines
+   (should be two), the Fordele heading on three lines (should be two), the
+   Om os paragraphs "too narrow and too short". */
+
+/* Om os: the two paragraphs shipped on `.body-4`, Terminal's smallest body
+   class (~17px) — every other primary paragraph on the page that carries
+   real content uses `.body-1` (~23px, min(1.4375rem,5.897vw)). At 17px in a
+   900px column the block reads as a thin, short island; bumping to their own
+   largest body scale gives it the same weight as the rest of the page. */
+#om .paragraph {
+  font-size: min(1.4375rem, 5.897vw);
+  line-height: 1.5;
+}
+
+/* Fordele heading (2026-08-19, corrected same day): the max-width bump this
+   comment used to describe never actually applied. Terminal's own rule is
+   `.product-grid__intro[data-v-d9cad3f0]` — the attribute selector makes it
+   (0,2,0), which beats a plain `.product-grid__intro` override at (0,1,0)
+   regardless of cascade order. The container sat at 900px the whole time.
+
+   With that confirmed, two-line balance at 900px/70px landed "Derfor vælger
+   folk en" over "containerbunker" alone — five words over one, which is what
+   Patrick called cramped. Rather than fight the container for a better
+   two-line split, this drops the size until the whole line fits on one:
+   "Derfor vælger folk en containerbunker" measures 734px unwrapped at 50px,
+   comfortably inside the 900px column with margin to spare. Specificity
+   fixed the same way the footer type already does it two sections down —
+   double class to tie (0,2,0) and win on source order. */
+.product-grid__heading.title-si {
+  font-size: min(3.6vw, 52px);
+}
+
+/* FAQ heading and kontakt heading: Patrick asked to drop the scroll reveal on
+   these two (it fired late/unreliably on the deployed build) and show the
+   text solid from first paint. Their own stylesheet ships the <strong> in a
+   light grey — the deliberate pre-reveal colour the removed JS timelines used
+   to animate away from — so removing the JS alone would leave it stuck
+   washed-out forever. This pins it straight to the colour the animation used
+   to end on. */
+.tabbed-accordion__richtext strong,
+.form-title[data-v-aa63f445] strong {
+  color: var(--c-dark-green);
+}

@@ -1,0 +1,620 @@
+/* ============================================================================
+   Hero left column — three compositions.
+   Loaded ONLY by hero-a / hero-b / hero-c .html, never by index.html.
+   Each variant is keyed on [data-hero] on <html>, so nothing here can leak.
+
+   The rule this sheet is written under: the site already has a voice. It is
+   the boot sequence - blueprint grid, hairlines, small caps labels with wide
+   tracking, one accent that appears only where you can act. The hero is the
+   one block that ignores all of it and reaches for a white rounded form box
+   on a photograph instead. So none of these three variants invent a new look;
+   they pull the look the site already has into the one place it is missing.
+
+   Shared to all three:
+     - the fine-print line is folded into a meta row, so the ladder under the
+       headline is 3 steps, not 4
+     - no border-radius on the address field: this site's geometry is cut, not
+       rounded (see the notch separator and the boot clip paths)
+     - the accent NEVER becomes a large fill - it is reserved for the focus
+       line and the submit affordance
+   ========================================================================= */
+
+[data-hero] {
+  --hx-label: 11px;
+  --hx-track: 0.16em;
+  --hx-line: rgba(255, 255, 255, 0.28);
+  --hx-line-soft: rgba(255, 255, 255, 0.16);
+  --hx-dim: rgba(255, 255, 255, 0.62);
+}
+
+[data-hero] ::selection {
+  background: var(--accent);
+  color: #f5f8fc;
+}
+
+/* the old ladder, neutralised in all three */
+[data-hero] .hero-copy .hero-sub,
+[data-hero] .hero-copy .hero-fine {
+  display: none !important;
+}
+
+/* labels: one spec, reused by all three variants */
+[data-hero] .hx-label {
+  font-family: var(--font-primary);
+  font-size: var(--hx-label);
+  font-weight: 600;
+  letter-spacing: var(--hx-track);
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--hx-dim);
+  margin: 0;
+}
+
+[data-hero] .hx-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-primary);
+  font-size: var(--hx-label);
+  font-weight: 600;
+  letter-spacing: var(--hx-track);
+  text-transform: uppercase;
+  color: var(--hx-dim);
+  margin: 0;
+}
+[data-hero] .hx-meta i {
+  display: block;
+  width: 3px;
+  height: 3px;
+  background: currentColor;
+  opacity: 0.7;
+  font-style: normal;
+}
+
+/* ---------------------------------------------------------------------------
+   A - MAALELINJEN  (the measuring line)
+
+   The box is removed entirely. Address entry becomes a single ruled line that
+   runs the full width of the column, with the submit as text at its right end.
+   Overline, headline and line all sit between the same two vertical edges, so
+   the column reads as one measured object rather than four stacked things.
+
+   Signature: on focus the accent rule wipes in from the left over the white
+   hairline. It is the plot being measured, and it is the only place the accent
+   appears in the whole composition.
+   ------------------------------------------------------------------------ */
+
+[data-hero='a'] .hero-copy {
+  width: min(640px, 100%);
+}
+
+[data-hero='a'] .hx-rule {
+  height: 1px;
+  background: var(--hx-line-soft);
+  margin: 14px 0 34px;
+}
+
+[data-hero='a'] .hero-copy h1 {
+  font-size: clamp(2.5rem, 4.05vw + 1.1rem, 5.25rem) !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.035em !important;
+  line-height: 0.98 !important;
+  margin: 0 !important;
+  text-wrap: balance;
+}
+
+[data-hero='a'] .hero-copy .hero-check {
+  display: block !important;
+  width: 100% !important;
+  margin: 46px 0 0 !important;
+  position: relative;
+  background: none !important;
+  border: 0 !important;
+}
+
+[data-hero='a'] .hx-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  padding-bottom: 14px;
+}
+
+[data-hero='a'] .hero-check input {
+  flex: 1 1 auto;
+  height: auto !important;
+  min-width: 0;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  color: #fff !important;
+  font-family: var(--font-primary) !important;
+  font-size: 22px !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.01em !important;
+  line-height: 1.3 !important;
+}
+[data-hero='a'] .hero-check input::placeholder {
+  color: rgba(255, 255, 255, 0.42) !important;
+}
+
+[data-hero='a'] .hero-check button {
+  flex: 0 0 auto;
+  /* 11px measured too faint against the bright half of the sky. One step up,
+     tracking held, so it still reads as a label and not a second headline. */
+  --hx-label: 12px;
+  height: auto !important;
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  color: #fff !important;
+  font-size: var(--hx-label) !important;
+  font-weight: 600 !important;
+  letter-spacing: var(--hx-track) !important;
+  text-transform: uppercase !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transform: none !important;
+  transition: color 0.18s ease !important;
+}
+[data-hero='a'] .hero-check button svg {
+  width: 16px;
+  height: 10px;
+  overflow: visible;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (hover: hover) {
+  [data-hero='a'] .hero-check button:hover {
+    color: #fff !important;
+  }
+  [data-hero='a'] .hero-check button:hover svg {
+    transform: translateX(6px);
+  }
+}
+[data-hero='a'] .hero-check button:focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 6px;
+}
+[data-hero='a'] .hero-check button:active svg {
+  transform: translateX(3px);
+}
+
+/* the two rules: a static white hairline, and the accent one that wipes over it */
+[data-hero='a'] .hx-underline,
+[data-hero='a'] .hx-underline::after {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+}
+[data-hero='a'] .hx-underline {
+  background: var(--hx-line);
+  pointer-events: none;
+}
+[data-hero='a'] .hx-underline::after {
+  content: '';
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.52s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-hero='a'] .hero-check:focus-within .hx-underline::after {
+  transform: scaleX(1);
+}
+
+[data-hero='a'] .hx-meta {
+  margin-top: 20px !important;
+}
+
+/* ---------------------------------------------------------------------------
+   B - PLADEN  (the slab)
+
+   The complaint underneath "it looks messy" is that the type has no ground.
+   White words and a white box float on a photograph with nothing holding them.
+   So B gives them one: a solid navy slab that runs off the left edge of the
+   viewport and stops on a hard vertical accent rule. The photo keeps the right
+   half. Now the headline can go large without fighting the house.
+
+   Signature: the blueprint grid from the boot sequence, at 6% opacity, inside
+   the slab. It is the only place on the page that texture appears, and it ties
+   the hero to the load screen the visitor just watched.
+   ------------------------------------------------------------------------ */
+
+/* the scrim is redundant once there is a slab */
+[data-hero='b'] .video-carousel .content::before {
+  display: none !important;
+}
+
+[data-hero='b'] .video-carousel .content {
+  padding-left: 0 !important;
+}
+
+/* The first pass floated: the slab started and stopped inside the photo, so it
+   read as a card rather than half of a split hero. It now runs the full height
+   of the hero and off the left edge, which is the whole point of the idea. */
+[data-hero='b'] .hero-copy {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: min(716px, 62vw);
+  padding: 0 clamp(28px, 4vw, 64px) 0 clamp(20px, 5vw, 70px);
+  /* replica.css pushes .hero-copy down 6vh to place a floating text block in
+     the frame. A slab that is meant to reach both edges cannot carry that, and
+     it is what left a 54px strip of photo above it. */
+  transform: none !important;
+  background-color: #0d1c2e;
+  background-image: repeating-linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.06) 0 1px,
+      transparent 1px 48px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.06) 0 1px,
+      transparent 1px 48px
+    );
+  border-right: 2px solid var(--accent);
+}
+
+[data-hero='b'] .hx-label {
+  margin-bottom: 26px !important;
+}
+
+[data-hero='b'] .hero-copy h1 {
+  font-size: clamp(2.5rem, 4.4vw + 1rem, 5.5rem) !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.035em !important;
+  line-height: 0.96 !important;
+  margin: 0 !important;
+}
+
+[data-hero='b'] .hx-lede {
+  display: block !important;
+  margin: 26px 0 0 !important;
+  max-width: 34ch;
+  font-size: 18px !important;
+  line-height: 1.55 !important;
+  color: rgba(255, 255, 255, 0.72) !important;
+}
+
+/* one joined control. No gap, no radius, no seam - the button is the right
+   end of the field, not a second object parked beside it. */
+[data-hero='b'] .hero-copy .hero-check {
+  display: flex !important;
+  width: 100% !important;
+  max-width: 560px;
+  margin: 40px 0 0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  transition: border-color 0.18s ease;
+}
+[data-hero='b'] .hero-copy .hero-check:focus-within {
+  border-color: var(--accent);
+}
+
+[data-hero='b'] .hero-check input {
+  flex: 1 1 auto !important;
+  min-width: 0;
+  height: 60px !important;
+  padding: 0 20px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  color: #fff !important;
+  font-size: 16px !important;
+}
+[data-hero='b'] .hero-check input::placeholder {
+  color: rgba(255, 255, 255, 0.44) !important;
+}
+
+[data-hero='b'] .hero-check button {
+  flex: 0 0 auto !important;
+  height: 60px !important;
+  padding: 0 30px !important;
+  border-radius: 0 !important;
+  border: 0 !important;
+  border-left: 1px solid var(--accent) !important;
+  background: var(--accent) !important;
+  color: #f5f8fc !important;
+  font-size: var(--hx-label) !important;
+  letter-spacing: var(--hx-track) !important;
+  transform: none !important;
+}
+@media (hover: hover) {
+  [data-hero='b'] .hero-check button:hover {
+    background: var(--accent-hover) !important;
+    transform: none !important;
+  }
+}
+[data-hero='b'] .hero-check button:active {
+  background: #24509f !important;
+  transform: none !important;
+}
+[data-hero='b'] .hero-check button:focus-visible {
+  outline: 2px solid #fff !important;
+  outline-offset: -4px;
+}
+
+[data-hero='b'] .hx-meta {
+  margin-top: 22px !important;
+}
+
+/* ---------------------------------------------------------------------------
+   C - TITELBLOKKEN  (the title block)
+
+   An engineering drawing carries its facts in a ruled block in the margin, and
+   the drawing itself sits beside it. That is exactly the shape this content
+   wants: three fixed facts that never change, and one headline that does the
+   talking. The vertical hairline between them is the whole composition.
+
+   Everything except the margin notes shares ONE left edge. The three facts are
+   the only ones the brand file allows us to state, so nothing here is invented.
+
+   Signature: the ruled margin block. It is the boot sequence's grid reduced to
+   a single line, and it is the reason this hero could not belong to any other
+   company.
+   ------------------------------------------------------------------------ */
+
+/* Pulled in from 800: the check bar's right edge was landing on the white
+   gable of the house, so the bar read as mud. It now stops over the sky. */
+[data-hero='c'] .hero-copy {
+  width: min(720px, 100%);
+}
+
+[data-hero='c'] .hx-grid {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  column-gap: 28px;
+}
+
+/* This variant carries no slab, so the scrim has to do the grounding on its
+   own - and it has to reach further right than the shared one, because the
+   headline starts 233px in rather than at the gutter. */
+[data-hero='c'] .video-carousel .content::before {
+  background: linear-gradient(
+    100deg,
+    rgba(13, 28, 46, 0.74) 0%,
+    rgba(13, 28, 46, 0.52) 38%,
+    rgba(13, 28, 46, 0) 68%
+  ) !important;
+}
+
+[data-hero='c'] .hx-spec {
+  list-style: none;
+  margin: 0;
+  padding: 6px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+[data-hero='c'] .hx-spec li {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+[data-hero='c'] .hx-spec b {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+[data-hero='c'] .hx-spec span {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: var(--hx-track);
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* the rule runs the full height of the block, margin-note style */
+/* At 0.16 alpha the rule vanished against the sky and the whole margin-note
+   device went with it. This line IS the composition, so it gets full strength. */
+[data-hero='c'] .hx-main {
+  border-left: 1px solid rgba(255, 255, 255, 0.34);
+  padding-left: 28px;
+}
+
+[data-hero='c'] .hero-copy h1 {
+  font-size: clamp(2.5rem, 3.6vw + 1.15rem, 4.75rem) !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.032em !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+}
+
+/* the check bar sits in the drawing column too, so there is one left edge */
+[data-hero='c'] .hero-copy .hero-check {
+  display: flex !important;
+  align-items: stretch;
+  width: 100% !important;
+  /* At full column width the bar's right end ran onto the white gable and the
+     translucent fill went muddy across it. Cut back to clear the roofline. */
+  max-width: 470px;
+  margin: 38px 0 0 !important;
+  border: 1px solid var(--hx-line);
+  background: rgba(13, 28, 46, 0.55);
+  transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+[data-hero='c'] .hero-copy .hero-check:focus-within {
+  border-color: var(--accent);
+  background: rgba(13, 28, 46, 0.72);
+}
+
+[data-hero='c'] .hero-check input {
+  flex: 1 1 auto !important;
+  min-width: 0;
+  height: 58px !important;
+  padding: 0 20px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  color: #fff !important;
+  font-size: 16px !important;
+}
+[data-hero='c'] .hero-check input::placeholder {
+  color: rgba(255, 255, 255, 0.46) !important;
+}
+
+[data-hero='c'] .hero-check button {
+  flex: 0 0 auto !important;
+  height: 58px !important;
+  padding: 0 26px !important;
+  border: 0 !important;
+  border-left: 1px solid var(--hx-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #fff !important;
+  font-size: var(--hx-label) !important;
+  letter-spacing: var(--hx-track) !important;
+  transform: none !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  transition: background-color 0.18s ease, color 0.18s ease !important;
+}
+[data-hero='c'] .hero-check button svg {
+  width: 16px;
+  height: 10px;
+  overflow: visible;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@media (hover: hover) {
+  [data-hero='c'] .hero-check button:hover {
+    background: var(--accent) !important;
+    color: #f5f8fc !important;
+    transform: none !important;
+  }
+  [data-hero='c'] .hero-check button:hover svg {
+    transform: translateX(5px);
+  }
+}
+[data-hero='c'] .hero-check button:active {
+  background: #24509f !important;
+  transform: none !important;
+}
+[data-hero='c'] .hero-check button:focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: -4px;
+}
+
+[data-hero='c'] .hx-meta {
+  margin-top: 20px !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Phone. Every variant collapses to the same shape: one column, no rules that
+   would run off the screen, controls that stay tall enough to hit.
+   ------------------------------------------------------------------------ */
+
+@media (max-width: 700px) {
+  /* The shared scrim runs left-to-right, which is the right axis for a 1440
+     frame and the wrong one for a 390 phone: at that width the copy sits over
+     the lit half of the house and the white type loses the wall. A and C have
+     no slab to fall back on, so on phones their scrim turns vertical.
+     B is exempt - its slab already IS the ground. */
+  [data-hero='a'] .video-carousel .content::before,
+  [data-hero='c'] .video-carousel .content::before {
+    background: linear-gradient(
+      to bottom,
+      rgba(13, 28, 46, 0.4) 0%,
+      rgba(13, 28, 46, 0.76) 44%,
+      rgba(13, 28, 46, 0.88) 100%
+    ) !important;
+  }
+
+  [data-hero] .hero-copy {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  [data-hero] .hx-meta {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+
+  [data-hero='a'] .hx-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+  }
+  [data-hero='a'] .hero-check input {
+    font-size: 18px !important;
+  }
+  /* Measured 17px tall on a phone: a text button has no padding to fall back
+     on once the row stops being a row. It becomes a bordered block instead,
+     which is the same object, sized for a thumb. */
+  [data-hero='a'] .hero-check button {
+    align-self: stretch;
+    justify-content: space-between;
+    min-height: 52px;
+    padding: 0 20px !important;
+    border: 1px solid var(--hx-line) !important;
+  }
+  [data-hero='a'] .hx-row {
+    padding-bottom: 0;
+  }
+  [data-hero='a'] .hx-underline {
+    display: none;
+  }
+  [data-hero='a'] .hero-check input {
+    border-bottom: 1px solid var(--hx-line) !important;
+    padding-bottom: 12px !important;
+  }
+
+  [data-hero='b'] .hero-copy {
+    width: 100% !important;
+    padding: 40px 20px 44px;
+    border-right: 0;
+    border-bottom: 2px solid var(--accent);
+  }
+  [data-hero='b'] .hero-copy .hero-check {
+    flex-direction: column;
+    max-width: 100%;
+  }
+  [data-hero='b'] .hero-check button {
+    width: 100%;
+    border-left: 0 !important;
+    border-top: 1px solid var(--accent) !important;
+  }
+
+  [data-hero='c'] .hx-grid {
+    grid-template-columns: 1fr;
+    row-gap: 26px;
+  }
+  [data-hero='c'] .hx-spec {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px 26px;
+    padding-top: 0;
+  }
+  [data-hero='c'] .hx-main {
+    border-left: 0;
+    padding-left: 0;
+  }
+  [data-hero='c'] .hero-copy .hero-check {
+    flex-direction: column;
+  }
+  [data-hero='c'] .hero-check button {
+    width: 100%;
+    justify-content: space-between;
+    border-left: 0 !important;
+    border-top: 1px solid var(--hx-line) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-hero] .hx-underline::after,
+  [data-hero] .hero-check button svg {
+    transition: none !important;
+  }
+}

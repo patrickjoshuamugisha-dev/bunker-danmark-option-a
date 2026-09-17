@@ -1,0 +1,193 @@
+/* =====================================================================
+   Bunker Danmark · V11 · the update layer (2026-09-16)
+   Loaded after polish.css. Brings V11 level with what V12 settled without
+   touching V11's composition: section 2 reads the V12 way (grey letters
+   turn to ink as a beat rises through the reading window, V12's sizes),
+   the four process pictures and the home at dusk in the statement slot.
+   Notes: docs/2026-09-16-v11-update.md
+   ===================================================================== */
+
+/* ---------- 1. Section 2: the reading voice ----------
+   js/app.js (stepsEngine, FILL) toggles .on per character. The old band
+   painted colours inline; nothing paints inline now, so the stylesheet
+   owns both colours. The unread grey is the one round 2 settled (#a9b3bd,
+   2.1:1 on paper: clearly unread, still legible). */
+.features-steps.has-fill .scroll-item .split__wrapper .split-chars {
+  color: var(--sweep-rest, #a9b3bd) !important;
+  animation: none !important;
+  transition: color 0.35s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+.features-steps.has-fill .scroll-item .split__wrapper .split-chars.on {
+  color: var(--ink, #141a21) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .features-steps.has-fill .scroll-item .split__wrapper .split-chars {
+    color: var(--ink, #141a21) !important;
+    transition: none !important;
+  }
+}
+
+/* ---------- 2. Section 2: V12's beat sizes ----------
+   V12 at 1470: title 40px/600, text 26px/450 on a 1.42 leading, 34ch wide.
+   The title is its own block; the two <br>s that used to make the gap are
+   gone from the markup. Beats sit V12's distance apart (11rem at 1470,
+   was Terminal's 21.5rem), so the next beat is in view under the one
+   being read, the way V12 shows it. */
+.features-steps.has-fill .scroll-item p {
+  font-size: clamp(1.25rem, 1rem + 0.75vw, 1.625rem) !important;
+  font-weight: 450 !important;
+  line-height: 1.42 !important;
+  letter-spacing: -0.008em !important;
+  max-width: 34ch;
+  text-wrap: pretty;
+}
+.features-steps .scroll-item p > strong {
+  display: block !important;
+  margin: 0 0 0.4em;
+}
+.features-steps.has-fill .scroll-item p > strong {
+  display: block !important;
+  font-size: clamp(1.75rem, 1.05rem + 1.6vw, 2.5rem) !important;
+  font-weight: 600 !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.028em !important;
+  margin: 0 0 0.45em !important;
+  text-wrap: balance;
+}
+@media (min-width: 1024px) {
+  .features-steps.has-fill .scroll-items-list {
+    gap: clamp(7rem, 3rem + 8vw, 11rem) !important;
+  }
+}
+
+/* the four pictures are one shoot on one grey day; the grade from the
+   polish layer (saturate 0.92, contrast 1.02) stays. They are 3:2, the
+   panel is taller than that: cover, framed a touch below centre so the
+   lawn and the pit stay in, the sky gives. */
+.features-steps .media-el img.video {
+  object-position: 50% 58%;
+}
+
+/* ---------- 3. The quote slot: the picture changes, nothing else ----------
+   Patrick, 2026-09-16 (round 2): the quote block stays exactly as it was
+   (centred, quote marks, author, blur, size). Only the photograph is new,
+   the home at dusk, and it is dimmed further so the words pop. The
+   original wash (final.css 30) is topped up with a heavier flat veil and a
+   deeper pool behind the text; the photograph's own blur stays. */
+.big-image-content::after {
+  background:
+    radial-gradient(ellipse 72% 60% at 50% 46%, rgba(2, 8, 16, 0.5) 0%, rgba(2, 8, 16, 0.26) 55%, rgba(2, 8, 16, 0) 82%),
+    linear-gradient(rgba(3, 10, 18, 0.38), rgba(3, 10, 18, 0.34) 50%, rgba(3, 10, 18, 0.48)) !important;
+}
+.big-image-content .image-wrapper {
+  filter: blur(1.5px) saturate(0.8) brightness(0.72);
+}
+
+/* ---------- 3b. The contact card, a little prettier ----------
+   Patrick: keep the smaller card, not V12's layout, but borrow from V12's
+   card. Borrowed: the fields are boxes (a faint fill, a hairline, the
+   site's 8px corners, 56px tall) instead of a bare underline, labels one
+   step smaller and dimmer so the fields lead, V12's placeholders, and the
+   focus ring. The card's size, padding, colour, button and sheen stay. */
+.contact-card .cf-field {
+  gap: 10px !important;
+}
+.contact-card .cf-field label {
+  font-size: 13px !important;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: rgba(238, 242, 246, 0.72);
+}
+.contact-card .cf-field input,
+.contact-card .cf-field--lead input,
+.roi-calculator-reference .contact-card .cf-field input {
+  /* !important: final.css 4120 (the short-window rule) sets an underline
+     field with no side padding and wins otherwise; Patrick saw the
+     placeholder touching the rim */
+  height: 54px !important;
+  padding: 0 18px !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(238, 242, 246, 0.14);
+  border-radius: 8px;
+  transition: border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.contact-card .cf-field input::placeholder {
+  color: rgba(238, 242, 246, 0.42);
+}
+.contact-card .cf-field input:hover {
+  border-color: rgba(238, 242, 246, 0.26);
+}
+.contact-card .cf-field input:focus {
+  border-color: #9dbdf0;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(157, 189, 240, 0.22);
+}
+.contact-card .cf-field input[aria-invalid="true"] {
+  border-color: #ff9a9a;
+}
+/* the old fill-in line under the field: gone, the ring is the focus cue now */
+.contact-card .cf-field::after {
+  display: none;
+}
+.contact-card .contact-form {
+  gap: 22px !important;
+}
+.contact-card .cf-two {
+  gap: 0 18px !important;
+}
+/* phone: Navn and Telefon stack, so they need the form's own 22px between them */
+@media (max-width: 1023.98px) {
+  .contact-card .cf-two {
+    gap: 22px !important;
+  }
+}
+.contact-card .cf-foot {
+  gap: 12px !important;
+  margin-top: 2px !important;
+}
+.contact-card .cf-line {
+  color: rgba(238, 242, 246, 0.56);
+}
+.contact-card .cf-send {
+  height: 54px;
+}
+.contact-card .cf-send:focus-visible {
+  outline: 2px solid #9dbdf0;
+  outline-offset: 3px;
+}
+
+/* ---------- 3c. The footer button: filled, the brand blue ----------
+   Patrick: the outlined footer button reads unfinished. It is the page's
+   blue button now, like the bar and the form. */
+@media (min-width: 1024px) {
+  .footer .button-tilt[data-v-d0493d08],
+  .footer .header-link {
+    background: var(--accent, #2b5fbf) !important;
+    color: #fff !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+  }
+  .footer .button-tilt[data-v-d0493d08]:hover,
+  .footer .header-link:hover {
+    background: var(--accent-hover, #3b6fd2) !important;
+    color: #fff !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 14px 34px -12px rgba(59, 111, 210, 0.8) !important;
+  }
+  .footer .button-tilt[data-v-d0493d08]:active,
+  .footer .header-link:active {
+    background: var(--accent, #2b5fbf) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  }
+}
+@media (max-width: 1023px) {
+  .footer .button-tilt[data-v-d0493d08],
+  .footer .header-link {
+    background: var(--accent, #2b5fbf) !important;
+    color: #fff !important;
+  }
+}
+
+/* ---------- 4. Small type fixes that came with the new lines ----------
+   The Om os heading is shorter now ("Om Bunker Danmark"); the paragraph
+   under it keeps its measure. Nothing else moves. */

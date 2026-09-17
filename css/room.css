@@ -1,0 +1,47 @@
+/* =====================================================================
+   V11 · the room comes into section 3 (2026-09-17, Patrick's pick: story option 1)
+   V12's third section (inside the bunker) sits after Processen, on the page's own navy (#0d1c2e: the
+   footer, the contact card), and the three cards follow inside the same navy section. Additive: drop
+   this file and the block in index.html and the section is the paper card row again.
+   Motion is the page's own, all in js/polish.js: the 18px entrance (data-pol), the text riding at 1.05,
+   the picture leaning with the pointer like the card pictures. The cards keep every hover they had.
+   Grid: the photograph bleeds off the left edge (the process panel bleeds off the right); the text
+   column ends on the cards' right edge, 78px in.
+   ===================================================================== */
+.room11-navy { background: #0d1c2e !important; color: #eef2f6; position: relative; }
+#fordele.room11-navy.product-grid { padding-top: 120px !important; }
+.room11 { display: grid; grid-template-columns: minmax(0, 46fr) minmax(0, 54fr); gap: clamp(40px, 6vw, 96px); align-items: center; margin: 0 -70px 150px; padding-right: 78px; }
+.room11__media { margin: 0; height: min(74vh, 640px); overflow: hidden; border-radius: 0 20px 20px 0; box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.7); }
+.room11__media img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 55%; will-change: transform; }
+.room11__title { margin: 0; font-size: clamp(2.5rem, 4.4vw, 4.25rem); font-weight: 500; letter-spacing: -0.035em; line-height: 1.02; color: #f3f5f7; }
+.room11__lead { margin: 28px 0 0; max-width: 30em; font-size: 20px; line-height: 1.5; color: rgba(238, 242, 246, 0.82); text-wrap: pretty; }
+.room11-navy .product-grid__heading { color: #f3f5f7 !important; }
+/* the fold under the navy section: the tab hangs into the contact section's own grey, no paper strip between */
+.room11-navy + .notch-separator__wrapper .notch-top__bg-container { background: #e1e6eb !important; }
+
+/* The cards on navy (2026-09-17, Patrick: the white frame pops out of the blue, too much contrast).
+   The card is a step of the same navy, lit from above like the contact card: a hairline rim, a soft inner
+   top light, a deep shadow under it. The photograph is the only bright thing. The pointer's blue rim
+   (polish.css) stays, it was made for a dark ground. */
+#fordele.room11-navy .product-grid__card,
+#fordele.room11-navy .product-grid__card:hover {
+  background: #13243a !important;
+  border: 1px solid rgba(238, 242, 246, 0.09) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 36px 70px -36px rgba(0, 0, 0, 0.75) !important;
+}
+#fordele.room11-navy .product-grid__card::before { inset: -1px; padding: 1px; }
+#fordele.room11-navy .product-grid__card-heading { color: #f3f5f7 !important; }
+#fordele.room11-navy .product-grid__card p,
+#fordele.room11-navy .product-grid__card-desc p { color: rgba(238, 242, 246, 0.72) !important; }
+/* more air under the headline (Patrick: not enough white space below it) and under the row before the fold */
+#fordele.room11-navy .product-grid__intro { margin-bottom: 80px !important; }
+#fordele.room11-navy.product-grid { padding-bottom: 200px !important; }
+
+@media (max-width: 1023.98px) {
+  #fordele.room11-navy.product-grid { padding-bottom: 110px !important; }
+  #fordele.room11-navy.product-grid { padding-top: 0 !important; }
+  .room11 { grid-template-columns: 1fr; gap: 36px; margin: 0 -20px 72px; padding-right: 0; }
+  .room11__media { height: 52vh; border-radius: 0; box-shadow: none; }
+  .room11__text { padding: 0 20px; }
+  .room11__lead { font-size: 18px; }
+}
