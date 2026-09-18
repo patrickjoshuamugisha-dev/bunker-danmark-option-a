@@ -4435,13 +4435,14 @@ html.js-reveal .contact-card.is-in { transform: none; }
   48%, 100% { opacity: 0; }
 }
 
-/* 2026-09-18: the logo (icon 34 and the name) replaces the text name; markup from logos/final4/dump.sh.
-   Wide on one line above phone width, two lines on a phone and in the phone menu. */
-.brand-wordmark { line-height: 0 !important; }
-.logo { position: relative; display: block; flex: none; color: inherit; }
-.logo--stack { display: none; }
-.logo--stack.logo--always { display: block; }
-@media (max-width: 760px) { .logo--wide { display: none; } .logo--stack { display: block; } }
+/* 2026-09-18: the name alone, in the approved logo's lettering (Instrument Sans 500, letters -0.015em,
+   a little extra word space). The icon lives in the tab icon, the loader and shared links instead.
+   Sizes give 14px capitals in the menu, 16px in the phone menu, 22px in the footer. */
+.brand-wordmark { font-family: var(--font-primary); letter-spacing: -0.012em; word-spacing: 0; line-height: 1 !important; white-space: nowrap; font-size: 19.5px; }
+.brand-wordmark .wm-k { font-weight: 620 !important; }
+.brand-wordmark .wm-l { font-weight: 400 !important; }
+.brand-wordmark.brand-wordmark--drawer { font-size: 22px; }
+.brand-wordmark.brand-wordmark--footer { font-size: 30px; }
 
 /* 2026-09-18: the loader shows the new logo (logo 3: icon 34, then "Bunker Danmark" in one weight).
    Same two beats as before: the icon wipes in where the bold BUNKER did (Terminal's icon beat),
@@ -4449,10 +4450,17 @@ html.js-reveal .contact-card.is-in { transform: none; }
    above still sizes it: capitals 0.72em, icon 1.55 x capitals = 1.116em, gap 0.75 x capitals = 0.54em.
    With line-height 1.3em the capitals' middle sits 0.65em down, and the icon's ink balance point
    (58% down) lands there when its top is at the top of the line. */
-.boot__mark { display: inline-flex; align-items: flex-start; gap: 0.54em; font-weight: 500; letter-spacing: -0.015em; }
-.boot__icon { display: block; flex: none; font-weight: inherit; }
-.boot__icon svg { display: block; height: 1.116em; width: 1.340em; margin-top: 0.005em; }
-.boot__name { display: block; white-space: nowrap; }
-.boot__mark .sp { margin-right: 0.06em; }
-/* 13 letters instead of 7: a shorter stagger so the last one still lands at 3376ms, before the doors */
-.boot__mark .ch { transition-delay: calc(var(--r) * 18ms); }
+.boot__mark { letter-spacing: -0.012em; }
+.boot__markb { font-weight: 620; }
+.boot__mark .ch { font-weight: 400; }
+
+/* The menu box, 2026-09-18 (Patrick: "a little bit too compact... compressed"; then "we went too wide...
+   take it a step back to number 1: same box, more space between the words"). Only while the links show (1280px and up). */
+@media (min-width: 1280px) {
+  /* then "spread too far on both sides": gaps back in (40 after the name, 30 between links), name and links a touch larger */
+  .site-header .inner { padding: 15px 18px 15px 26px !important; gap: 40px !important; }
+  header nav.nav ul { gap: 30px !important; }
+  .site-header .nav a, .site-header .nav { font-size: 15.5px !important; }
+  .site-header .brand-wordmark { font-size: 20.5px; }
+  .site-header .header-actions { gap: 12px !important; }
+}
