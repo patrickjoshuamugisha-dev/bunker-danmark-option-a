@@ -4434,3 +4434,11 @@ html.js-reveal .contact-card.is-in { transform: none; }
   44% { opacity: 1; }
   48%, 100% { opacity: 0; }
 }
+
+/* 2026-09-18: the logo (icon 34 and the name) replaces the text name; markup from logos/final4/dump.sh.
+   Wide on one line above phone width, two lines on a phone and in the phone menu. */
+.brand-wordmark { line-height: 0 !important; }
+.logo { position: relative; display: block; flex: none; color: inherit; }
+.logo--stack { display: none; }
+.logo--stack.logo--always { display: block; }
+@media (max-width: 760px) { .logo--wide { display: none; } .logo--stack { display: block; } }

@@ -213,11 +213,13 @@ h1, h2, h3, .title-si, .title-h2, .title-h3, .price-lead { text-wrap: balance; }
   .video-carousel > .wrapper > span::after {
     mix-blend-mode: multiply;
     background:
-      radial-gradient(56% 62% at 16% 66%, rgba(18, 22, 28, 0.4) 0%, rgba(18, 22, 28, 0) 100%),
-      linear-gradient(90deg, rgba(18, 22, 28, 0.56) 0%, rgba(18, 22, 28, 0.34) 30%, rgba(18, 22, 28, 0) 60%),
-      linear-gradient(0deg, rgba(18, 22, 28, 0.58) 0%, rgba(18, 22, 28, 0.26) 30%, rgba(18, 22, 28, 0) 56%),
-      linear-gradient(180deg, rgba(18, 22, 28, 0.42) 0%, rgba(18, 22, 28, 0.14) 26%, rgba(18, 22, 28, 0) 46%) !important;
+      /* 2026-09-17: heavy sky (Patrick picked 2 on sheet-A): more weight up top, less on the left and the ground */
+      radial-gradient(56% 62% at 16% 66%, rgba(18, 22, 28, 0.34) 0%, rgba(18, 22, 28, 0) 100%),
+      linear-gradient(180deg, rgba(18, 22, 28, 0.7) 0%, rgba(18, 22, 28, 0.42) 22%, rgba(18, 22, 28, 0.12) 42%, rgba(18, 22, 28, 0) 56%),
+      linear-gradient(90deg, rgba(18, 22, 28, 0.4) 0%, rgba(18, 22, 28, 0.2) 30%, rgba(18, 22, 28, 0) 55%),
+      linear-gradient(0deg, rgba(18, 22, 28, 0.3) 0%, rgba(18, 22, 28, 0) 24%) !important;
   }
+  .video-carousel > .wrapper > span { filter: saturate(0.94) contrast(1.06); }
   .video-carousel > .homepage-scroll-content > .content {
     align-items: flex-end !important;
     padding-bottom: 150px !important;
